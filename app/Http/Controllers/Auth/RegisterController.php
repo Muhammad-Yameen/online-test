@@ -81,17 +81,22 @@ class RegisterController extends Controller
 
         event(new Registered($user = $this->create($request->all())));
 
-
         $token = Auth::login($user);
-        return response()->json([
-            'status' => 'success',
-            'message' => 'User created successfully',
-            'user' => $user,
-            'authorisation' => [
-                'token' => $token,
-                'type' => 'bearer',
-            ]
-        ]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'User created successfully',
+                'user' => $user,
+                'authorisation' => [
+                    'token' => $token,
+                    'type' => 'bearer',
+                ]
+            ]);
+        }else{
+            $request->session()->put('token', $token);
+            return redirect('/login');
+        }
 
     }
 }
